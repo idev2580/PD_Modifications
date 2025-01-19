@@ -13,9 +13,9 @@ https://github.com/ArthurFirmino/progressive-denoising
 
 ## Data
 Only directory-modified version of progressive denoiser's dataset.
-- Train : http://idev2580dev.work/files/TRAIN.tar.gz
-- Test : http://idev2580dev.work/files/TEST.tar.gz
-- Valid : http://idev2580dev.work/files/VALID.tar.gz
+- Train : https://idev2580dev.work/files/TRAIN.tar.gz
+- Test : https://idev2580dev.work/files/TEST.tar.gz
+- Valid : https://idev2580dev.work/files/VALID.tar.gz
 
 1. Download all these 3 files.
 2. Make `DATASET` under this project folder.
