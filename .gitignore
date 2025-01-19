@@ -1,13 +1,14 @@
 *.odt*
 *.pdf
+*.ods
 .vscode/
 __pycache__/
 DATASET/TEST/
 DATASET/TRAIN/
 DATASET/VALID/
 DATASET/VALID_TEST/
+SAMPLE_IMG/
 DATASET/*
 progressive-denoising/
-progressive-denoising/*
 *.pth
 activate

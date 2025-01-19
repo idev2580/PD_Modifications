@@ -106,13 +106,29 @@ class SureKernelPredictingNetwork(nn.Module):
         outputs = outputs.sum(dim=[4,5]) # Sum over Kernel Height and Kernel Width
         outputs = outputs.view(batch_num, h, w, 3)
         return outputs
+    def is_weight_nan(self):
+        for name, param in self.named_parameters():
+            if torch.isnan(param).any():
+                print("Nan found in name{}".format(name))
+                return True
+        return False
+    
+    def weight_nan_remover(self):
+        for name, param in self.named_parameters():
+            if torch.isnan(param).any():
+                param.data = torch.where(torch.isnan(param.data), torch.zeros_like(param.data), param.data)
+        return
 
 def save_model(model,path):
     torch.save(model.state_dict(), path)
 
-def load_model(model, path, is_eval=False):
+def load_model(model, path, is_eval=False, is_cpu=False):
     model.load_state_dict(torch.load(path, weights_only=True))
-    model.to(torch.device('cuda'))
+    if(is_cpu):
+        model.to(torch.device('cpu'))
+    else:
+        model.to(torch.device('cuda'))
+    
     if(is_eval):
         model.eval()
     return model

@@ -17,7 +17,11 @@ import torch.nn.functional as F
 from SD_MODEL import *
 from SD_DATALOADER import *
 
-BATCH_SIZE=5 #From Bako et al. 2022
+
+# Configurations
+BATCH_SIZE = 5 #From Bako et al. 2022
+MODEL_DIR  = "./MODEL/"
+MODEL_NAME = "SD_MODEL_BEST_FOR_241201(EPOCH90).pth"
 
 __RAND_ITER = 0
 __RAND_MAX = 10000000
@@ -61,17 +65,21 @@ def main():
     valid_ds = PDSUREDataset("./DATASET/VALID", transform = train_transform)
     #train_ds = PDSUREDataset("./DATASET/VALID_TEST", transform = train_transform)
     #valid_ds = PDSUREDataset("./DATASET/VALID_TEST", transform = train_transform)
-    train_loader = DataLoader(train_ds, batch_size = BATCH_SIZE, shuffle=False)
+    train_loader = DataLoader(train_ds, batch_size = BATCH_SIZE, shuffle=True)
     valid_loader = DataLoader(valid_ds, batch_size = 1, shuffle=False)
 
     #Initialize Network, Optimizer
+    model_dir = str(os.path.join(MODEL_DIR, MODEL_NAME))
     net = SureKernelPredictingNetwork(None).to(device)
-    if(os.path.exists("SD_MODEL_CHKPNT.pth")):
-        print("Load Model (CHKPNT)")
-        net = load_model(net, "SD_MODEL_CHKPNT.pth")
+
+    if(os.path.exists(model_dir)):
+        print("Load Model ({})".format(model_dir))
+        net = load_model(net, model_dir)
+    
+    #net = net.half()
 
     crit = nn.MSELoss()
-    opt = optim.Adam(net.parameters(), lr=0.00001)
+    opt = optim.Adagrad(net.parameters(), lr=0.000002)
 
     timestamp = datetime.now()
 
@@ -97,6 +105,8 @@ def main():
             epsilon = 1e-8
             loss = crit(outputs, ppse) + epsilon
             if (math.isnan(float(loss))):
+                if(net.is_weight_nan()):
+                    net.weight_nan_remover()
                 print("(EPOCH)Loss is NAN(e={}, i={}) -> Skip(Min_Loss={})".format(epoch, i, min_loss))
                 continue
 
@@ -138,18 +148,20 @@ def main():
 
         print("#### End Epoch {}, Loss(train)={:22.16f}, Loss(valid)={:22.16f} ####".format(epoch, epoch_loss, valid_loss))
         save_name = "SD_MODEL_{}_EPOCH{}.pth".format(timestamp, epoch)
-        save_model(net, save_name)
+        save_dir = str(os.path.join(MODEL_DIR, save_name))
+        save_model(net, save_dir)
         print("-> MODEL SAVED : "+save_name)
         if(epoch_loss < min_loss):
             min_loss = epoch_loss
             min_epoch = epoch
-            save_model(net, "SD_MODEL_CHKPNT.pth")
+            save_model(net, "SD_MODEL_CHKPNT_2.pth")
             print("-> MODEL SAVED(CHKPNT)")
             
 
     #Save Model
     save_name = "SD_MODEL.{}.pth".format(timestamp)
-    save_model(net, save_name)
+    save_dir = str(os.path.join(MODEL_DIR, save_name))
+    save_model(net, save_dir)
 
 
 if __name__ == '__main__':
