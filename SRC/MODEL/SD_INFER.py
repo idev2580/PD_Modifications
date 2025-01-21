@@ -19,12 +19,12 @@ from SD_DATALOADER import *
 
 ############ CONFIGURATION ############
 MODEL_DIR  = "./MODEL/"
-MODEL_NAME = "SD_MODEL_BEST_FOR_241201(EPOCH90).pth"
+MODEL_NAME = "SD_MODEL_CHKPNT.pth"
 
 def main():
-    '''if not torch.cuda.is_available():
+    if not torch.cuda.is_available():
         print("CUDA is not available")
-        return False'''
+        return False
     
     device = torch.device('cuda')
     
@@ -58,16 +58,16 @@ def main():
     net = SureKernelPredictingNetwork(None).to(device)
     if(os.path.exists(model_dir)):
         print("Load Model")
-        net = load_model(net, model_dir, True, True)
+        net = load_model(net, model_dir, True, True).to(device)
     net.eval()
     torch.no_grad()
     
     for lname, loader in loaders.items():
         print("Loader : {}".format(lname))
         for i,data in enumerate(loader, 0):
-            in_sure, ppse = data
-            in_sure, ppse = in_sure.to(device), ppse.to(device)
-
+            _in_sure, _ppse = data
+            in_sure, ppse = _in_sure.to(device), _ppse.to(device)
+            
             outputs = net(in_sure)
             _d1, h, w, _d2 = outputs.shape
             in_sure = in_sure.view(1,3,h,w).permute(0,2,3,1)

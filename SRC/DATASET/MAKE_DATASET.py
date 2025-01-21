@@ -63,6 +63,6 @@ def make_dataset(dirname:str, calc_pprse=False, is_test=False):
     return
 
 if __name__ == '__main__':
-    make_dataset('./DATASET/TRAIN/')
-    make_dataset('./DATASET/VALID/')
-    make_dataset('./DATASET/TEST/', False, True)
+    #make_dataset('./DATASET/TRAIN/', True)
+    #make_dataset('./DATASET/VALID/', True)
+    make_dataset('./DATASET/TEST/', True, True)

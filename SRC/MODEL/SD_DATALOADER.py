@@ -13,10 +13,8 @@ class PDSUREDataset(torch.utils.data.Dataset):
         #Data Load Code
         #1. Scan directory
         data_files = []
-        if(not isRelSE):
-            data_files = os.listdir(os.path.join(directory, "ORIG_SURE"))
-        else:
-            data_files = os.listdir(os.path.join(directory, "PPRDSURE"))
+        data_files = os.listdir(os.path.join(directory, "ORIG_SURE"))
+
         _target_files = os.listdir(os.path.join(directory, "ERROR_GT")) if not isTest else data_files
         target_files = []
 
@@ -43,7 +41,7 @@ class PDSUREDataset(torch.utils.data.Dataset):
         data = []
         for df in data_files:
             if(isRelSE):
-                with OpenEXR.File(os.path.join(*[directory, "PPRDSURE", df])) as ifile:
+                with OpenEXR.File(os.path.join(*[directory, "ORIG_SURE", df])) as ifile:
                     pixels = torch.tensor(ifile.channels()["RGB"].pixels).float() # h, w, rgb(3)
                     pixels = pixels.view(pixels.shape[0], pixels.shape[1], pixels.shape[2])
                     pixels = pixels.permute(2,0,1)
